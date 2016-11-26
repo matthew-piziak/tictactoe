@@ -20,7 +20,7 @@ fn root_handler(req: &mut Request) -> IronResult<Response> {
     let board_param: String =
         params["board"].first().expect("Could not read `board` query parameter").clone();
     match Board::try_from(board_param) {
-        Ok(board) => Ok(Response::with((status::Ok, format!("{}", play(board))))),
+        Ok(board) => Ok(Response::with((status::Ok, format!("{}\n", play(board))))),
         Err(()) => Ok(Response::with((status::BadRequest, "Board could not be parsed\n"))),
     }
 }
@@ -179,7 +179,7 @@ impl Board {
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 enum GameResult {
     XWins,
     OWins,
@@ -223,7 +223,6 @@ impl TryFrom<String> for Board {
         for marker in markers.iter() {
             *count.entry(*marker).or_insert(0) += 1;
         }
-        println!("Count: {:?}", count);
         if count[&Marker::Empty] == 9 {
             Ok(Board { markers: markers })
         } else if (count[&Marker::O] != count[&Marker::X]) || (count[&Marker::Empty] == 0) {
@@ -270,4 +269,26 @@ fn optimal_first_move() {
     let next_board = play(board);
     assert_eq!(next_board,
                Board { markers: [O, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty] });
+}
+
+
+// There are multiple perfect games. This is just verifying that the behavior
+// doesn't change as I refactor.
+#[test]
+fn perfect_game() {
+    let board = Board::try_from("+++++++++".into()).unwrap();
+    let next_board = play(board);
+    assert_eq!(format!("{}", next_board), "o        ");
+    let board = Board::try_from("o+++x++++".into()).unwrap();
+    let next_board = play(board);
+    assert_eq!(format!("{}", next_board), "oo  x    ");
+    let board = Board::try_from("oox+x++++".into()).unwrap();
+    let next_board = play(board);
+    assert_eq!(format!("{}", next_board), "oox x o  ");
+    let board = Board::try_from("ooxxx+o++".into()).unwrap();
+    let next_board = play(board);
+    assert_eq!(format!("{}", next_board), "ooxxxoo  ");
+    let board = Board::try_from("ooxxx+oox".into()).unwrap();
+    let next_board = play(board);
+    assert_eq!(format!("{}", next_board), "ooxxxooox");
 }

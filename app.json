@@ -1,0 +1,9 @@
+{
+  "name": "Tic Tac Toe API",
+  "description": "A Tic Tac Toe server written as a programming assignment",
+  "repository": "https://github.com/matthew-piziak/tictactoe",
+  "success_url": "/",
+  "env": {
+    "BUILDPACK_URL": "https://github.com/emk/heroku-buildpack-rust.git"
+  }
+}

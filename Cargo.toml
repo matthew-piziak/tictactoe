@@ -1,0 +1,14 @@
+[package]
+name = "tictactoe"
+version = "0.1.0"
+authors = ["matthew.piziak@gmail.com"]
+
+[[bin]]
+name = "tictactoe"
+
+[dependencies]
+iron = "0.4.0"
+urlencoded = "0.4.1"
+
+[dependencies.router]
+git = "https://github.com/iron/router.git"

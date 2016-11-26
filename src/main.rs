@@ -90,6 +90,7 @@ impl TryFrom<char> for Marker {
             'x' => Ok(Marker::X),
             'o' => Ok(Marker::O),
             '+' => Ok(Marker::Empty),
+            ' ' => Ok(Marker::Empty),
             _ => Err(()),
         }
     }
@@ -240,6 +241,16 @@ fn parse_example() {
     let board = Board::try_from("+xxo++o++".into());
     assert_eq!(board,
                Ok(Board { markers: [Empty, X, X, O, Empty, Empty, O, Empty, Empty] }));
+}
+
+#[test]
+fn parse_empty_board() {
+    use Marker::*;
+    let board = Board::try_from("+++++++++".into());
+    assert_eq!(board,
+               Ok(Board {
+                   markers: [Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty],
+               }));
 }
 
 #[test]

@@ -12,18 +12,20 @@ use urlencoded::UrlEncodedQuery;
 use std::convert::TryFrom;
 use std::env;
 use std::collections::HashMap;
+use std::fmt;
 
 fn root_handler(req: &mut Request) -> IronResult<Response> {
-    let params = req.get_ref::<UrlEncodedQuery>().expect("Could not read query parameters");
+    let params = req.get_ref::<UrlEncodedQuery>().expect("Could not read query parameters"); // to response
     let board_param =
-        params["board"].first().expect("Could not read `board` query parameter").clone();
+        params["board"].first().expect("Could not read `board` query parameter").clone(); // to response
     match Board::try_from(board_param) {
         Ok(board) => if board.is_o_turn() {
-            Ok(Response::with((status::Ok, format!("Board: {:?}!", board))))
+            let response_board = board;
+            Ok(Response::with((status::Ok, format!("{}", response_board))))
         } else {
-            Ok(Response::with((status::BadRequest, "It is not O's turn")))
+            Ok(Response::with((status::BadRequest, "It is not O's turn\n")))
         },
-        Err(()) => Ok(Response::with((status::BadRequest, "Board could not be parsed")))
+        Err(()) => Ok(Response::with((status::BadRequest, "Board could not be parsed\n")))
     }
 }
 
@@ -59,6 +61,16 @@ impl TryFrom<char> for Marker {
     }
 }
 
+impl fmt::Display for Marker {
+    fn fmt(&self, f: &mut fmt:: Formatter) -> fmt::Result {
+        write!(f, "{}", match self {
+            &Marker::X => "x",
+            &Marker::O => "o",
+            &Marker::Empty => " ",
+        })
+    }
+}
+
 #[derive(Debug)]
 struct Board {
     markers: [Marker; 9],
@@ -71,6 +83,21 @@ impl Board {
             *count.entry(*marker).or_insert(0) += 1;
         }
         (count[&Marker::O] == count[&Marker::X]) && (count[&Marker::Empty] != 0)
+    }
+}
+
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let board_string: String = self.markers.into_iter().map(display_marker).collect();
+        write!(f, "{}", board_string)
+    }
+}
+
+fn display_marker(marker: &Marker) -> char {
+    match marker {
+        &Marker::X => 'x',
+        &Marker::O => 'o',
+        &Marker::Empty => ' ',
     }
 }
 

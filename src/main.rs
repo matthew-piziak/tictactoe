@@ -8,17 +8,16 @@ extern crate router;
 extern crate urlencoded;
 
 use iron::prelude::*;
-use router::Router;
 use iron::status;
+use router::Router;
 use urlencoded::UrlEncodedQuery;
 
-use std::env;
 use std::convert::TryFrom;
+use std::env;
 
 mod board;
 
 fn root_handler(req: &mut Request) -> IronResult<Response> {
-    // TODO: to response
     let params = req.get_ref::<UrlEncodedQuery>().expect("Could not read query parameters");
     let board_param: String =
         params["board"].first().expect("Could not read `board` query parameter").clone();

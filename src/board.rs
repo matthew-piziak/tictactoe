@@ -1,8 +1,8 @@
 //! The Tic-tac-toe board.
 
+use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::fmt;
-use std::collections::HashMap;
 
 /// Plays the board by one move from O's perspective. O is the first player.
 pub fn play<'a>(board: Board) -> Board {

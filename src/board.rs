@@ -1,7 +1,10 @@
+//! The Tic-tac-toe board.
+
 use std::convert::TryFrom;
 use std::fmt;
 use std::collections::HashMap;
 
+/// Plays the board by one move from O's perspective. O is the first player.
 pub fn play<'a>(board: Board) -> Board {
     let mut children: Vec<Board> = vec![];
     let mut minimaxen: Vec<GameResult> = vec![];
@@ -73,6 +76,12 @@ impl fmt::Display for Marker {
     }
 }
 
+/// The Tic-tac-toe board.
+///
+/// Markers are read across the board left-to-right, top-to-bottom:
+/// 0 1 2
+/// 3 4 5
+/// 6 7 8
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Board {
     markers: [Marker; 9],
@@ -201,7 +210,7 @@ impl TryFrom<String> for Board {
 
 #[test]
 fn parse_example() {
-    use Marker::*;
+    use self::Marker::*;
     let board = Board::try_from("+xxo++o++".into());
     assert_eq!(board,
                Ok(Board { markers: [Empty, X, X, O, Empty, Empty, O, Empty, Empty] }));
@@ -209,7 +218,7 @@ fn parse_example() {
 
 #[test]
 fn parse_empty_board() {
-    use Marker::*;
+    use self::Marker::*;
     let board = Board::try_from("+++++++++".into());
     assert_eq!(board,
                Ok(Board {
@@ -219,7 +228,7 @@ fn parse_empty_board() {
 
 #[test]
 fn o_wins_example() {
-    use Marker::*;
+    use self::Marker::*;
     let board = Board::try_from("+xxo++o++".into()).unwrap();
     let next_board = play(board);
     assert_eq!(next_board,
@@ -229,7 +238,7 @@ fn o_wins_example() {
 
 #[test]
 fn optimal_first_move() {
-    use Marker::*;
+    use self::Marker::*;
     let board = Board::try_from("+++++++++".into()).unwrap();
     let next_board = play(board);
     assert_eq!(next_board,

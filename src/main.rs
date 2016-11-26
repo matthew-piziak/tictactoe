@@ -1,4 +1,7 @@
+//! A Tic-tac-toe server.
+
 #![feature(try_from)]
+#![deny(missing_docs)]
 
 extern crate iron;
 extern crate router;

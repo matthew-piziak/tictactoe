@@ -1,7 +1,6 @@
 //! The Tic-tac-toe board.
 
 use std::collections::HashMap;
-use std::convert::TryFrom;
 use std::fmt;
 
 /// Plays the board by one move from O's perspective. O is the first player.
@@ -53,9 +52,7 @@ impl From<Player> for Marker {
     }
 }
 
-impl TryFrom<char> for Marker {
-    type Err = ();
-
+impl Marker {
     fn try_from(c: char) -> Result<Marker, ()> {
         match c {
             'x' => Ok(Marker::X),
@@ -154,34 +151,8 @@ impl Board {
             }
         }
     }
-}
 
-#[derive(Debug, PartialEq, Eq)]
-enum GameResult {
-    XWins,
-    OWins,
-    Draw,
-}
-
-impl fmt::Display for Board {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let board_string: String = self.markers.into_iter().map(display_marker).collect();
-        write!(f, "{}", board_string)
-    }
-}
-
-fn display_marker(marker: &Marker) -> char {
-    match marker {
-        &Marker::X => 'x',
-        &Marker::O => 'o',
-        &Marker::Empty => ' ',
-    }
-}
-
-impl TryFrom<String> for Board {
-    type Err = ();
-
-    fn try_from(string: String) -> Result<Board, ()> {
+    pub fn try_from(string: String) -> Result<Board, ()> {
         if string.len() != 9 {
             return Err(());
         }
@@ -208,6 +179,28 @@ impl TryFrom<String> for Board {
         } else {
             Ok(Board { markers: markers })
         }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum GameResult {
+    XWins,
+    OWins,
+    Draw,
+}
+
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let board_string: String = self.markers.into_iter().map(display_marker).collect();
+        write!(f, "{}", board_string)
+    }
+}
+
+fn display_marker(marker: &Marker) -> char {
+    match marker {
+        &Marker::X => 'x',
+        &Marker::O => 'o',
+        &Marker::Empty => ' ',
     }
 }
 

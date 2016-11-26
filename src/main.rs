@@ -1,8 +1,5 @@
 //! A Tic-tac-toe server.
 
-#![feature(try_from)]
-#![deny(missing_docs)]
-
 extern crate iron;
 extern crate router;
 extern crate urlencoded;
@@ -12,7 +9,6 @@ use iron::status;
 use router::Router;
 use urlencoded::UrlEncodedQuery;
 
-use std::convert::TryFrom;
 use std::env;
 
 mod board;

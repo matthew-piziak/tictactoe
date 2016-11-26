@@ -38,15 +38,18 @@ enum Marker {
     Empty,
 }
 
+#[derive(Copy, Clone)]
 enum Player {
     X,
     O,
 }
 
-fn player_to_marker(player: &Player) -> Marker {
-    match *player {
-        Player::X => Marker::X,
-        Player::O => Marker::O,
+impl From<Player> for Marker {
+    fn from(player: Player) -> Marker {
+        match player {
+            Player::X => Marker::X,
+            Player::O => Marker::O,
+        }
     }
 }
 
@@ -89,7 +92,7 @@ pub struct Board {
 
 impl Board {
     fn has_triple(&self, player: Player) -> bool {
-        let marker = player_to_marker(&player);
+        let marker: Marker = Marker::from(player);
         // rows
         (self.markers[0] == marker && self.markers[1] == marker && self.markers[2] == marker) ||
         (self.markers[3] == marker && self.markers[4] == marker && self.markers[5] == marker) ||
@@ -108,7 +111,7 @@ impl Board {
         for (index, marker) in self.markers.iter().enumerate() {
             if *marker == Marker::Empty {
                 let mut child_markers = self.markers.clone();
-                child_markers[index] = player_to_marker(next_player);
+                child_markers[index] = Marker::from(next_player.clone());
                 children.push(Board { markers: child_markers });
             }
         }

@@ -20,14 +20,7 @@ fn root_handler(req: &mut Request) -> IronResult<Response> {
     let board_param =
         params["board"].first().expect("Could not read `board` query parameter").clone();
     match Board::try_from(board_param) {
-        Ok(board) => {
-            if board.is_o_turn() {
-                let response_board = board;
-                Ok(Response::with((status::Ok, format!("{}", response_board))))
-            } else {
-                Ok(Response::with((status::BadRequest, "It is not O's turn\n")))
-            }
-        }
+        Ok(board) => Ok(Response::with((status::Ok, format!("{}", board)))),
         Err(()) => Ok(Response::with((status::BadRequest, "Board could not be parsed\n"))),
     }
 }
@@ -82,14 +75,6 @@ struct Board {
 }
 
 impl Board {
-    fn is_o_turn(&self) -> bool {
-        let mut count: HashMap<Marker, u8> = HashMap::new();
-        for marker in self.markers.iter() {
-            *count.entry(*marker).or_insert(0) += 1;
-        }
-        (count[&Marker::O] == count[&Marker::X]) && (count[&Marker::Empty] != 0)
-    }
-
     fn has_triple(&self, marker: Marker) -> bool {
         // rows
         (self.markers[0] == marker && self.markers[1] == marker && self.markers[2] == marker) ||
@@ -134,6 +119,15 @@ impl TryFrom<String> for Board {
                 Err(_) => return Err(()),
             }
         }
-        Ok(Board { markers: markers })
+
+        let mut count: HashMap<Marker, u8> = HashMap::new();
+        for marker in markers.iter() {
+            *count.entry(*marker).or_insert(0) += 1;
+        }
+        if (count[&Marker::O] == count[&Marker::X]) && (count[&Marker::Empty] != 0) {
+            Err(())
+        } else {
+            Ok(Board { markers: markers })
+        }
     }
 }

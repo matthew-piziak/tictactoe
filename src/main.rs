@@ -15,17 +15,20 @@ use std::collections::HashMap;
 use std::fmt;
 
 fn root_handler(req: &mut Request) -> IronResult<Response> {
-    let params = req.get_ref::<UrlEncodedQuery>().expect("Could not read query parameters"); // to response
+    // TODO: to response
+    let params = req.get_ref::<UrlEncodedQuery>().expect("Could not read query parameters");
     let board_param =
-        params["board"].first().expect("Could not read `board` query parameter").clone(); // to response
+        params["board"].first().expect("Could not read `board` query parameter").clone();
     match Board::try_from(board_param) {
-        Ok(board) => if board.is_o_turn() {
-            let response_board = board;
-            Ok(Response::with((status::Ok, format!("{}", response_board))))
-        } else {
-            Ok(Response::with((status::BadRequest, "It is not O's turn\n")))
-        },
-        Err(()) => Ok(Response::with((status::BadRequest, "Board could not be parsed\n")))
+        Ok(board) => {
+            if board.is_o_turn() {
+                let response_board = board;
+                Ok(Response::with((status::Ok, format!("{}", response_board))))
+            } else {
+                Ok(Response::with((status::BadRequest, "It is not O's turn\n")))
+            }
+        }
+        Err(()) => Ok(Response::with((status::BadRequest, "Board could not be parsed\n"))),
     }
 }
 
@@ -62,12 +65,14 @@ impl TryFrom<char> for Marker {
 }
 
 impl fmt::Display for Marker {
-    fn fmt(&self, f: &mut fmt:: Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            &Marker::X => "x",
-            &Marker::O => "o",
-            &Marker::Empty => " ",
-        })
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,
+               "{}",
+               match self {
+                   &Marker::X => "x",
+                   &Marker::O => "o",
+                   &Marker::Empty => " ",
+               })
     }
 }
 
@@ -83,6 +88,20 @@ impl Board {
             *count.entry(*marker).or_insert(0) += 1;
         }
         (count[&Marker::O] == count[&Marker::X]) && (count[&Marker::Empty] != 0)
+    }
+
+    fn has_triple(&self, marker: Marker) -> bool {
+        // rows
+        (self.markers[0] == marker && self.markers[1] == marker && self.markers[2] == marker) ||
+        (self.markers[3] == marker && self.markers[4] == marker && self.markers[5] == marker) ||
+        (self.markers[6] == marker && self.markers[7] == marker && self.markers[9] == marker) ||
+        // columns
+        (self.markers[0] == marker && self.markers[3] == marker && self.markers[6] == marker) ||
+        (self.markers[1] == marker && self.markers[4] == marker && self.markers[7] == marker) ||
+        (self.markers[2] == marker && self.markers[5] == marker && self.markers[8] == marker) ||
+        // diagonals
+        (self.markers[0] == marker && self.markers[4] == marker && self.markers[8] == marker) ||
+        (self.markers[2] == marker && self.markers[4] == marker && self.markers[6] == marker)
     }
 }
 

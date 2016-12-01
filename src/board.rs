@@ -115,11 +115,17 @@ impl Board {
         children
     }
 
+    fn has_empty_positions(&self) -> bool {
+        self.markers.contains(&Marker::Empty)
+    }
+
     fn minimax(&self, next_player: &Player) -> GameResult {
         if self.has_triple(Player::X) {
             return GameResult::XWins;
         } else if self.has_triple(Player::O) {
             return GameResult::OWins;
+        } else if !self.has_empty_positions() {
+            return GameResult::Draw;
         } else {
             let mut minimaxen: Vec<GameResult> = vec![];
             let next_next_player = match *next_player {
